@@ -23,23 +23,23 @@ export default function SearchBar() {
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="flex gap-3">
+      <div className="flex gap-0">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by book title, author, or ISBN..."
-          className="flex-1 rounded-lg border border-border bg-surface px-4 py-3 text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+          placeholder="TITLE, AUTHOR, OR ISBN..."
+          className="flex-1 border-2 border-border bg-bg-surface px-4 py-3 text-fg font-mono text-sm uppercase tracking-wider placeholder:text-fg-muted/50 focus:outline-none focus:border-accent"
         />
         <button
           type="submit"
-          className="rounded-lg bg-accent px-6 py-3 font-medium text-white hover:bg-accent/90 active:scale-[0.98]"
+          className="border-2 border-accent bg-accent px-6 py-3 font-mono font-bold text-sm uppercase tracking-wider text-black hover:bg-transparent hover:text-accent"
         >
           Search
         </button>
       </div>
-      <p className="mt-2 text-sm text-muted">
-        Tip: Enter an ISBN directly (e.g. 9780140449136) to jump straight to the book page.
+      <p className="mt-2 text-xs text-fg-muted font-mono">
+        // Enter an ISBN directly (e.g. 9780140449136) to jump straight to the book page
       </p>
     </form>
   );

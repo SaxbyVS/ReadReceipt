@@ -43,12 +43,12 @@ export default async function BookPage({ params }: BookPageProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <Link
         href="/"
-        className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent"
+        className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-fg-muted hover:text-accent border-b border-transparent hover:border-accent pb-0.5"
       >
-        &larr; Back to search
+        &larr; // BACK TO SEARCH
       </Link>
 
       <BookInfo book={book} />

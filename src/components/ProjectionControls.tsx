@@ -34,13 +34,16 @@ export default function ProjectionControls({
   onManualPageCountChange,
   hasPageCount,
 }: ProjectionControlsProps) {
+  // Compute daily stats for the dashboard number
+  const dailyPages = mode === "hours" ? Math.round((customHours * 60 * wpm) / wpp) : customPages;
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Manual page count input (shown when book has no page count) */}
       {!hasPageCount && (
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Enter Page Count Manually
+        <div className="border-2 border-border bg-bg-surface p-4">
+          <label className="block font-mono text-xs uppercase tracking-widest text-fg-muted mb-2">
+            // ENTER PAGE COUNT
           </label>
           <input
             type="number"
@@ -49,111 +52,119 @@ export default function ProjectionControls({
             value={manualPageCount}
             onChange={(e) => onManualPageCountChange(e.target.value)}
             placeholder="e.g. 320"
-            className="w-40 rounded-md border border-border bg-surface px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+            className="w-40 border-b-2 border-border bg-transparent px-1 py-2 text-sm font-mono text-fg placeholder:text-fg-muted/50 focus:outline-none focus:border-accent"
           />
         </div>
       )}
 
-      {/* Reading speed */}
-      <div className="flex flex-wrap gap-6">
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Reading Speed (words/min)
+      {/* Two-column grid: Reading Speed + Daily Goal */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Reading Speed */}
+        <div className="border-2 border-border bg-bg-surface p-4">
+          <label className="block font-mono text-xs uppercase tracking-widest text-fg-muted mb-3">
+            // READING SPEED
           </label>
-          <div className="flex items-center gap-3">
-            <input
-              type="range"
-              min={100}
-              max={600}
-              step={10}
-              value={wpm}
-              onChange={(e) => onWpmChange(Number(e.target.value))}
-              className="w-40 accent-accent"
-            />
-            <input
-              type="number"
-              min={50}
-              max={1000}
-              value={wpm}
-              onChange={(e) => onWpmChange(Number(e.target.value) || DEFAULT_WPM)}
-              className="w-20 rounded-md border border-border bg-surface px-2 py-1 text-sm text-center focus:outline-none focus:ring-2 focus:ring-accent/30"
-            />
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min={100}
+                max={600}
+                step={10}
+                value={wpm}
+                onChange={(e) => onWpmChange(Number(e.target.value))}
+                className="flex-1 accent-accent"
+              />
+              <input
+                type="number"
+                min={50}
+                max={1000}
+                value={wpm}
+                onChange={(e) => onWpmChange(Number(e.target.value) || DEFAULT_WPM)}
+                className="w-20 border-b-2 border-border bg-transparent px-1 py-1 text-sm font-mono text-fg text-center focus:outline-none focus:border-accent"
+              />
+              <span className="text-xs font-mono text-fg-muted">WPM</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-xs font-mono text-fg-muted uppercase">Words/Page:</span>
+              <input
+                type="number"
+                min={100}
+                max={500}
+                value={wpp}
+                onChange={(e) => onWppChange(Number(e.target.value) || DEFAULT_WPP)}
+                className="w-20 border-b-2 border-border bg-transparent px-1 py-1 text-sm font-mono text-fg text-center focus:outline-none focus:border-accent"
+              />
+            </div>
+            <p className="text-xs font-mono text-fg-muted">// avg adult ~250 wpm, ~250 wpp</p>
           </div>
-          <p className="text-xs text-muted mt-1">Average adult: ~250 wpm</p>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Words per Page
+        {/* Daily Goal */}
+        <div className="border-2 border-border bg-bg-surface p-4">
+          <label className="block font-mono text-xs uppercase tracking-widest text-fg-muted mb-3">
+            // DAILY GOAL
           </label>
-          <input
-            type="number"
-            min={100}
-            max={500}
-            value={wpp}
-            onChange={(e) => onWppChange(Number(e.target.value) || DEFAULT_WPP)}
-            className="w-20 rounded-md border border-border bg-surface px-2 py-1 text-sm text-center focus:outline-none focus:ring-2 focus:ring-accent/30"
-          />
-          <p className="text-xs text-muted mt-1">Standard: ~250</p>
-        </div>
-      </div>
 
-      {/* Mode toggle + custom input */}
-      <div>
-        <label className="block text-sm font-medium mb-2">
-          Custom Projection
-        </label>
-        <div className="flex items-center gap-2 mb-3">
-          <button
-            onClick={() => onModeChange("hours")}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium ${
-              mode === "hours"
-                ? "bg-accent text-white"
-                : "bg-accent-light text-foreground hover:bg-accent-light/80"
-            }`}
-          >
-            Hours/Day
-          </button>
-          <button
-            onClick={() => onModeChange("pages")}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium ${
-              mode === "pages"
-                ? "bg-accent text-white"
-                : "bg-accent-light text-foreground hover:bg-accent-light/80"
-            }`}
-          >
-            Pages/Day
-          </button>
-        </div>
+          {/* Mode toggle */}
+          <div className="flex gap-0 mb-4">
+            <button
+              onClick={() => onModeChange("hours")}
+              className={`px-4 py-1.5 text-xs font-mono uppercase tracking-wider border-2 ${
+                mode === "hours"
+                  ? "bg-accent text-black border-accent font-bold"
+                  : "bg-transparent text-fg-muted border-border hover:text-fg"
+              }`}
+            >
+              Hours/Day
+            </button>
+            <button
+              onClick={() => onModeChange("pages")}
+              className={`px-4 py-1.5 text-xs font-mono uppercase tracking-wider border-2 border-l-0 ${
+                mode === "pages"
+                  ? "bg-accent text-black border-accent font-bold"
+                  : "bg-transparent text-fg-muted border-border hover:text-fg"
+              }`}
+            >
+              Pages/Day
+            </button>
+          </div>
 
-        {mode === "hours" ? (
-          <div className="flex items-center gap-3">
-            <input
-              type="range"
-              min={0.25}
-              max={12}
-              step={0.25}
-              value={customHours}
-              onChange={(e) => onCustomHoursChange(Number(e.target.value))}
-              className="w-48 accent-accent"
-            />
-            <span className="text-sm font-mono w-16 text-center">
-              {customHours}h/day
-            </span>
+          {mode === "hours" ? (
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min={0.25}
+                max={12}
+                step={0.25}
+                value={customHours}
+                onChange={(e) => onCustomHoursChange(Number(e.target.value))}
+                className="flex-1 accent-accent"
+              />
+              <span className="font-mono text-sm text-fg w-16 text-center">
+                {customHours}h
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <input
+                type="number"
+                min={1}
+                max={1000}
+                value={customPages}
+                onChange={(e) => onCustomPagesChange(Number(e.target.value))}
+                className="w-24 border-b-2 border-border bg-transparent px-1 py-1 text-sm font-mono text-fg text-center focus:outline-none focus:border-accent"
+              />
+              <span className="text-xs font-mono text-fg-muted uppercase">pages/day</span>
+            </div>
+          )}
+
+          {/* Dashboard number — large emphasis */}
+          <div className="mt-4 pt-4 border-t-2 border-border">
+            <span className="data-value text-3xl md:text-4xl">{dailyPages}</span>
+            <span className="text-sm font-mono text-fg-muted ml-2 uppercase">pages / day</span>
           </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              min={1}
-              max={1000}
-              value={customPages}
-              onChange={(e) => onCustomPagesChange(Number(e.target.value))}
-              className="w-24 rounded-md border border-border bg-surface px-2 py-1 text-sm text-center focus:outline-none focus:ring-2 focus:ring-accent/30"
-            />
-            <span className="text-sm text-muted">pages/day</span>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );

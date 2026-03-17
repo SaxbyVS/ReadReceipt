@@ -8,7 +8,7 @@ export default function BookInfo({ book }: BookInfoProps) {
   return (
     <div className="flex flex-col sm:flex-row gap-6">
       {/* Cover */}
-      <div className="h-64 w-44 flex-shrink-0 overflow-hidden rounded-lg bg-accent-light shadow-md self-start">
+      <div className="h-64 w-44 flex-shrink-0 overflow-hidden border-[3px] border-border-hard bg-bg-surface self-start">
         {book.coverUrl ? (
           <img
             src={book.coverUrl}
@@ -16,50 +16,51 @@ export default function BookInfo({ book }: BookInfoProps) {
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center text-5xl text-muted">
-            📕
+          <div className="flex h-full w-full items-center justify-center font-mono text-sm uppercase tracking-widest text-fg-muted">
+            No Cover
           </div>
         )}
       </div>
 
       {/* Details */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold text-accent">{book.title}</h1>
-        <p className="text-lg text-muted">
+        <h1 className="font-mono text-2xl md:text-3xl font-bold uppercase tracking-wider text-fg">
+          {book.title}
+        </h1>
+        <p className="text-lg text-fg-muted">
           {book.authors.join(", ")}
         </p>
 
-        <div className="mt-2 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+        <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm font-mono">
           {book.pageCount && (
             <div>
-              <span className="font-medium text-foreground">Pages:</span>{" "}
-              <span className="text-muted">{book.pageCount.toLocaleString()}</span>
+              <span className="text-xs uppercase tracking-widest text-fg-muted">Pages</span>{" "}
+              <span className="text-accent font-bold">{book.pageCount.toLocaleString()}</span>
             </div>
           )}
           {book.wordCount && (
             <div>
-              <span className="font-medium text-foreground">Est. Words:</span>{" "}
-              <span className="text-muted">
+              <span className="text-xs uppercase tracking-widest text-fg-muted">Est. Words</span>{" "}
+              <span className="text-fg">
                 ~{book.wordCount.toLocaleString()}
-                {book.pageCount ? " (estimated from page count)" : ""}
               </span>
             </div>
           )}
           {book.publishDate && (
             <div>
-              <span className="font-medium text-foreground">Published:</span>{" "}
-              <span className="text-muted">{book.publishDate}</span>
+              <span className="text-xs uppercase tracking-widest text-fg-muted">Published</span>{" "}
+              <span className="text-fg">{book.publishDate}</span>
             </div>
           )}
           <div>
-            <span className="font-medium text-foreground">ISBN:</span>{" "}
-            <span className="font-mono text-muted">{book.isbn}</span>
+            <span className="text-xs uppercase tracking-widest text-fg-muted">ISBN</span>{" "}
+            <span className="text-accent">{book.isbn}</span>
           </div>
         </div>
 
         {!book.pageCount && (
-          <p className="mt-3 rounded-md bg-accent-light/60 px-3 py-2 text-sm text-muted">
-            Page count not available from Open Library. You can enter it manually below to generate projections.
+          <p className="mt-3 border-2 border-border bg-bg-surface px-3 py-2 text-sm font-mono text-fg-muted">
+            // Page count unavailable — enter manually below
           </p>
         )}
       </div>

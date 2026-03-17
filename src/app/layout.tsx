@@ -27,30 +27,34 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-bg text-fg`}
       >
-        <header className="border-b border-border bg-surface">
+        <header className="border-b-2 border-border bg-bg-surface">
           <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 hover:opacity-80">
-              <span className="text-2xl">📖</span>
-              <span className="text-xl font-bold text-accent">ReadReceipt</span>
+            <Link href="/" className="flex items-center gap-3 hover:opacity-80">
+              <span className="text-accent font-mono text-sm tracking-widest uppercase border border-accent px-2 py-0.5">
+                //
+              </span>
+              <span className="text-xl font-mono font-bold tracking-wider uppercase text-fg">
+                Read<span className="text-accent">Receipt</span>
+              </span>
             </Link>
-            <p className="hidden sm:block text-sm text-muted">
-              Know when you&apos;ll finish your next book
+            <p className="hidden sm:block text-xs font-mono uppercase tracking-widest text-fg-muted">
+              Know when you&apos;ll finish
             </p>
           </div>
         </header>
         <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
-        <footer className="border-t border-border mt-16">
-          <div className="mx-auto max-w-5xl px-4 py-6 text-center text-sm text-muted">
-            ReadReceipt — Book data from{" "}
+        <footer className="border-t-2 border-border mt-16">
+          <div className="mx-auto max-w-5xl px-4 py-6 flex items-center justify-between text-xs font-mono uppercase tracking-widest text-fg-muted">
+            <span>ReadReceipt</span>
             <a
               href="https://openlibrary.org"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline hover:text-accent"
+              className="underline underline-offset-4 hover:text-accent"
             >
-              Open Library
+              Data: Open Library
             </a>
           </div>
         </footer>

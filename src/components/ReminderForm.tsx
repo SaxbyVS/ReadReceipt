@@ -58,34 +58,36 @@ export default function ReminderForm({ book, selectedRow }: ReminderFormProps) {
   }
 
   return (
-    <div className="rounded-lg border border-border bg-surface p-5">
-      <h3 className="font-semibold text-accent mb-1">Set Up Weekly Email Reminder</h3>
-      <p className="text-sm text-muted mb-4">
-        Get a weekly nudge to keep reading at {selectedRow.hoursPerDay}h/day ({selectedRow.pagesPerDay} pages/day).
-        Reminders stop automatically after your projected finish date or 3 months.
+    <div className="border-2 border-border bg-bg-surface p-5">
+      <h3 className="font-mono text-sm font-bold uppercase tracking-widest text-accent mb-1">
+        // WEEKLY REMINDER
+      </h3>
+      <p className="text-sm font-mono text-fg-muted mb-4">
+        Get a weekly nudge — {selectedRow.hoursPerDay}h/day ({selectedRow.pagesPerDay} pages/day).
+        Auto-stops after finish date or 3 months.
       </p>
 
-      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+      <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-0">
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="your@email.com"
           required
-          className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30"
+          className="flex-1 border-2 border-border bg-bg px-3 py-2 text-sm font-mono text-fg placeholder:text-fg-muted/50 focus:outline-none focus:border-accent"
         />
         <button
           type="submit"
           disabled={status === "loading"}
-          className="rounded-md bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent/90 disabled:opacity-50 active:scale-[0.98]"
+          className="border-2 border-accent bg-accent px-5 py-2 text-sm font-mono font-bold uppercase tracking-wider text-black hover:bg-transparent hover:text-accent disabled:opacity-50 sm:border-l-0"
         >
-          {status === "loading" ? "Setting up..." : "Set Reminder"}
+          {status === "loading" ? "SETTING UP..." : "SET REMINDER"}
         </button>
       </form>
 
       {message && (
         <p
-          className={`mt-3 text-sm ${
+          className={`mt-3 text-sm font-mono ${
             status === "success" ? "text-success" : "text-error"
           }`}
         >
