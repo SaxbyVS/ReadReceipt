@@ -1,7 +1,7 @@
 {
   "crons": [
     {
-      "path": "src/app/api/cron/send/route.ts",
+      "path": "/src/app/api/cron/send/route.ts",
       "schedule": "0 9 * * 1"
     }
   ]
