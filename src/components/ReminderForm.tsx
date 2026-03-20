@@ -60,7 +60,7 @@ export default function ReminderForm({ book, selectedRow }: ReminderFormProps) {
   return (
     <div className="border-2 border-border bg-bg-surface p-5">
       <h3 className="font-mono text-sm font-bold uppercase tracking-widest text-accent mb-1">
-        // WEEKLY REMINDER
+        {"// WEEKLY REMINDER"}
       </h3>
       <p className="text-sm font-mono text-fg-muted mb-4">
         Get a weekly nudge — {selectedRow.hoursPerDay}h/day ({selectedRow.pagesPerDay} pages/day).

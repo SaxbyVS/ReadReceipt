@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import ThemeToggle from "@/components/ThemeToggle";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -25,7 +26,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(() => {
+              try {
+                const stored = localStorage.getItem('readreceipt-theme');
+                document.documentElement.dataset.theme = stored === 'light' ? 'light' : 'dark';
+              } catch {
+                document.documentElement.dataset.theme = 'dark';
+              }
+            })();`,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-bg text-fg`}
       >
@@ -33,15 +48,18 @@ export default function RootLayout({
           <div className="mx-auto max-w-5xl px-4 py-4 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3 hover:opacity-80">
               <span className="text-accent font-mono text-sm tracking-widest uppercase border border-accent px-2 py-0.5">
-                //
+                {"//"}
               </span>
               <span className="text-xl font-mono font-bold tracking-wider uppercase text-fg">
                 Read<span className="text-accent">Receipt</span>
               </span>
             </Link>
-            <p className="hidden sm:block text-xs font-mono uppercase tracking-widest text-fg-muted">
-              Know when you&apos;ll finish
-            </p>
+            <div className="flex items-center gap-3">
+              <p className="hidden sm:block text-xs font-mono uppercase tracking-widest text-fg-muted">
+                Know when you&apos;ll finish
+              </p>
+              <ThemeToggle />
+            </div>
           </div>
         </header>
         <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>

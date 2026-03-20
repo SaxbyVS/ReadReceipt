@@ -6,12 +6,21 @@ import { ApiResponse, Book } from "@/types";
 
 interface BookPageProps {
   params: Promise<{ isbn: string }>;
+  searchParams: Promise<{ work?: string; title?: string }>;
 }
 
-async function fetchBook(isbn: string): Promise<Book | null> {
+async function fetchBook(
+  isbn: string,
+  options?: { work?: string; title?: string }
+): Promise<Book | null> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
   try {
-    const res = await fetch(`${baseUrl}/api/book/${isbn}`, {
+    const params = new URLSearchParams();
+    if (options?.work) params.set("work", options.work);
+    if (options?.title) params.set("title", options.title);
+
+    const query = params.toString();
+    const res = await fetch(`${baseUrl}/api/book/${isbn}${query ? `?${query}` : ""}`, {
       cache: "no-store",
     });
     if (!res.ok) return null;
@@ -22,9 +31,10 @@ async function fetchBook(isbn: string): Promise<Book | null> {
   }
 }
 
-export async function generateMetadata({ params }: BookPageProps) {
+export async function generateMetadata({ params, searchParams }: BookPageProps) {
   const { isbn } = await params;
-  const book = await fetchBook(isbn);
+  const { work, title } = await searchParams;
+  const book = await fetchBook(isbn, { work, title });
   if (!book) {
     return { title: "Book Not Found — ReadReceipt" };
   }
@@ -34,9 +44,10 @@ export async function generateMetadata({ params }: BookPageProps) {
   };
 }
 
-export default async function BookPage({ params }: BookPageProps) {
+export default async function BookPage({ params, searchParams }: BookPageProps) {
   const { isbn } = await params;
-  const book = await fetchBook(isbn);
+  const { work, title } = await searchParams;
+  const book = await fetchBook(isbn, { work, title });
 
   if (!book) {
     notFound();

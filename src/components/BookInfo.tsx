@@ -31,6 +31,12 @@ export default function BookInfo({ book }: BookInfoProps) {
           {book.authors.join(", ")}
         </p>
 
+        {book.language && (
+          <div className="mt-1 inline-flex self-start border-2 border-accent bg-accent-dim px-2 py-1 text-[10px] font-mono uppercase tracking-[0.18em] text-accent">
+            {book.language} edition
+          </div>
+        )}
+
         <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm font-mono">
           {book.pageCount && (
             <div>
@@ -56,11 +62,23 @@ export default function BookInfo({ book }: BookInfoProps) {
             <span className="text-xs uppercase tracking-widest text-fg-muted">ISBN</span>{" "}
             <span className="text-accent">{book.isbn}</span>
           </div>
+          {book.openLibraryUrl && (
+            <div>
+              <a
+                href={book.openLibraryUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs uppercase tracking-widest text-accent hover:underline"
+              >
+                {"// VIEW ON OPEN LIBRARY ->"}
+              </a>
+            </div>
+          )}
         </div>
 
         {!book.pageCount && (
           <p className="mt-3 border-2 border-border bg-bg-surface px-3 py-2 text-sm font-mono text-fg-muted">
-            // Page count unavailable — enter manually below
+            {"// Page count unavailable - enter it manually below or use %/day mode"}
           </p>
         )}
       </div>

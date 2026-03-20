@@ -7,7 +7,7 @@ export default function BookNotFound() {
         404
       </div>
       <h1 className="font-mono text-lg uppercase tracking-widest text-fg">
-        // BOOK NOT FOUND
+        {"// BOOK NOT FOUND"}
       </h1>
       <p className="text-fg-muted text-sm max-w-md text-center leading-relaxed">
         No book matched that ISBN in Open Library&apos;s database.

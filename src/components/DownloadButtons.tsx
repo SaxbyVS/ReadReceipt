@@ -29,10 +29,10 @@ export default function DownloadButtons({
   // ─── CSV Download ──────────────────────────────────────
 
   function downloadCSV() {
-    const header = "Hours/Day,Pages/Day,Days to Finish,Finish Date";
+    const header = "Hours/Day,Pages/Day,Days to Finish,Total Hours,Finish Date";
     const csvRows = rows.map(
       (r) =>
-        `${r.hoursPerDay},${r.pagesPerDay},${r.daysToFinish},${formatDateForExport(r.finishDate)}`
+        `${r.hoursPerDay},${r.pagesPerDay},${r.daysToFinish},${r.totalHours},${formatDateForExport(r.finishDate)}`
     );
 
     const meta = [
@@ -94,11 +94,12 @@ export default function DownloadButtons({
     // Table
     autoTable(doc, {
       startY: 60,
-      head: [["Hours/Day", "Pages/Day", "Days to Finish", "Finish Date"]],
+      head: [["Hours/Day", "Pages/Day", "Days to Finish", "Total Hours", "Finish Date"]],
       body: rows.map((r) => [
         `${r.hoursPerDay}h`,
         r.pagesPerDay.toString(),
         `${r.daysToFinish} days`,
+        `${r.totalHours}h`,
         formatDateForExport(r.finishDate),
       ]),
       theme: "grid",

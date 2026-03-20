@@ -4,13 +4,16 @@ export interface Book {
   isbn: string;
   title: string;
   authors: string[];
+  language: string | null;
   pageCount: number | null;
   wordCount: number | null;
   publishDate: string | null;
   coverUrl: string | null;
+  openLibraryUrl: string | null;
 }
 
 export interface BookSearchResult {
+  workKey: string;
   isbn: string;
   title: string;
   authors: string[];
@@ -20,7 +23,7 @@ export interface BookSearchResult {
 
 // ─── Projection Types ───────────────────────────────────────
 
-export type ProjectionMode = "hours" | "pages";
+export type ProjectionMode = "hours" | "pages" | "percent";
 
 export interface ProjectionInput {
   totalPages: number;
@@ -36,6 +39,14 @@ export interface ProjectionInput {
 export interface ProjectionRow {
   hoursPerDay: number;
   pagesPerDay: number;
+  daysToFinish: number;
+  totalHours: number;
+  finishDate: string; // ISO date string
+}
+
+/** Percent-based projection row (no page count needed) */
+export interface PercentProjectionRow {
+  percentPerDay: number;
   daysToFinish: number;
   finishDate: string; // ISO date string
 }

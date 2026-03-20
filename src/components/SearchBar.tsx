@@ -39,7 +39,7 @@ export default function SearchBar() {
         </button>
       </div>
       <p className="mt-2 text-xs text-fg-muted font-mono">
-        // Enter an ISBN directly (e.g. 9780140449136) to jump straight to the book page
+        {"// Enter an ISBN directly (e.g. 9780140449136) to jump straight to the book page"}
       </p>
     </form>
   );

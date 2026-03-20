@@ -8,7 +8,7 @@ interface BookCardProps {
 export default function BookCard({ book }: BookCardProps) {
   return (
     <Link
-      href={`/book/${book.isbn}`}
+      href={`/book/${book.isbn}?work=${encodeURIComponent(book.workKey)}&title=${encodeURIComponent(book.title)}`}
       className="group flex gap-4 border-2 border-border bg-bg-surface p-4 hover:border-accent"
     >
       {/* Cover thumbnail */}
