@@ -5,8 +5,9 @@ export interface IReminder extends Document {
   bookTitle: string;
   bookISBN: string;
   readingPlan: {
-    hoursPerDay: number;
-    pagesPerDay: number;
+    hoursPerDay?: number;
+    pagesPerDay?: number;
+    percentPerDay?: number;
     projectedFinishDate: string;
   };
   createdAt: Date;
@@ -19,8 +20,9 @@ const ReminderSchema = new Schema<IReminder>({
   bookTitle: { type: String, required: true },
   bookISBN: { type: String, required: true },
   readingPlan: {
-    hoursPerDay: { type: Number, required: true },
-    pagesPerDay: { type: Number, required: true },
+    hoursPerDay: { type: Number, required: false, default: null },
+    pagesPerDay: { type: Number, required: false, default: null },
+    percentPerDay: { type: Number, required: false, default: null },
     projectedFinishDate: { type: String, required: true },
   },
   createdAt: { type: Date, default: Date.now },

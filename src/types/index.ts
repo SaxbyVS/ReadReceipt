@@ -55,8 +55,9 @@ export interface PercentProjectionRow {
 // ─── Reminder Types ─────────────────────────────────────────
 
 export interface ReadingPlan {
-  hoursPerDay: number;
-  pagesPerDay: number;
+  hoursPerDay?: number;
+  pagesPerDay?: number;
+  percentPerDay?: number;
   projectedFinishDate: string;
 }
 

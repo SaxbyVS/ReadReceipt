@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { Book, ProjectionRow } from "@/types";
+import { Book, PercentProjectionRow, ProjectionRow } from "@/types";
 
 interface ReminderFormProps {
   book: Book;
-  selectedRow: ProjectionRow;
+  selectedRow?: ProjectionRow;
+  selectedPercentRow?: PercentProjectionRow;
 }
 
 function getNextReminderDate(now: Date = new Date()): Date {
@@ -22,7 +23,7 @@ function getNextReminderDate(now: Date = new Date()): Date {
   return next;
 }
 
-export default function ReminderForm({ book, selectedRow }: ReminderFormProps) {
+export default function ReminderForm({ book, selectedRow, selectedPercentRow }: ReminderFormProps) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
@@ -35,6 +36,21 @@ export default function ReminderForm({ book, selectedRow }: ReminderFormProps) {
     setStatus("loading");
     setMessage("");
 
+    const readingPlan = selectedPercentRow
+      ? {
+          percentPerDay: selectedPercentRow.percentPerDay,
+          projectedFinishDate: selectedPercentRow.finishDate,
+        }
+      : selectedRow
+      ? {
+          hoursPerDay: selectedRow.hoursPerDay,
+          pagesPerDay: selectedRow.pagesPerDay,
+          projectedFinishDate: selectedRow.finishDate,
+        }
+      : null;
+
+    if (!readingPlan) return;
+
     try {
       const res = await fetch("/api/reminder", {
         method: "POST",
@@ -43,11 +59,7 @@ export default function ReminderForm({ book, selectedRow }: ReminderFormProps) {
           email: email.trim(),
           bookTitle: book.title,
           bookISBN: book.isbn,
-          readingPlan: {
-            hoursPerDay: selectedRow.hoursPerDay,
-            pagesPerDay: selectedRow.pagesPerDay,
-            projectedFinishDate: selectedRow.finishDate,
-          },
+          readingPlan,
         }),
       });
 
@@ -58,7 +70,7 @@ export default function ReminderForm({ book, selectedRow }: ReminderFormProps) {
         const firstReminder = getNextReminderDate();
         setMessage(
           `Reminder set! You'll receive weekly emails about "${book.title}" until ${new Date(
-            selectedRow.finishDate
+            readingPlan.projectedFinishDate
           ).toLocaleDateString()}. First reminder: ${firstReminder.toLocaleString()}.`
         );
         setEmail("");
@@ -78,8 +90,11 @@ export default function ReminderForm({ book, selectedRow }: ReminderFormProps) {
         {"// WEEKLY REMINDER"}
       </h3>
       <p className="text-sm font-mono text-fg-muted mb-4">
-        Get a weekly nudge — {selectedRow.hoursPerDay}h/day ({selectedRow.pagesPerDay} pages/day).
-        Auto-stops after finish date or 3 months.
+        {selectedPercentRow
+          ? `Get a weekly nudge — ${selectedPercentRow.percentPerDay}%/day. Auto-stops after finish date or 3 months.`
+          : selectedRow
+          ? `Get a weekly nudge — ${selectedRow.hoursPerDay}h/day (${selectedRow.pagesPerDay} pages/day). Auto-stops after finish date or 3 months.`
+          : "Get a weekly nudge."}
       </p>
 
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-0">

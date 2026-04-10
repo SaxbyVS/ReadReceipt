@@ -29,12 +29,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (
-      !readingPlan ||
-      !readingPlan.hoursPerDay ||
-      !readingPlan.pagesPerDay ||
-      !readingPlan.projectedFinishDate
-    ) {
+    const hasPagePlan =
+      readingPlan &&
+      typeof readingPlan.hoursPerDay === "number" &&
+      typeof readingPlan.pagesPerDay === "number";
+    const hasPercentPlan =
+      readingPlan && typeof readingPlan.percentPerDay === "number";
+
+    if (!readingPlan || !readingPlan.projectedFinishDate || (!hasPagePlan && !hasPercentPlan)) {
       return NextResponse.json<ApiResponse<never>>(
         { success: false, error: "A complete reading plan is required." },
         { status: 400 }

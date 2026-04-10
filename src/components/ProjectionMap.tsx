@@ -145,6 +145,7 @@ export default function ProjectionMap({ book }: ProjectionMapProps) {
 
   // Selected row for reminder (defaults to the custom row or 1 hour/day)
   const selectedRow = customRow ?? tableRows.find((r) => r.hoursPerDay === 1) ?? tableRows[0];
+  const selectedPercentRow = customPercentRow ?? percentTableRows.find((r) => r.percentPerDay === 5) ?? percentTableRows[0];
 
   async function copyPlanSummary() {
     if (!selectedRow) return;
@@ -254,6 +255,19 @@ export default function ProjectionMap({ book }: ProjectionMapProps) {
           <p className="text-xs font-mono text-fg-muted uppercase tracking-wide">
             {"// percent/day mode works without a page count"}
           </p>
+
+          <DownloadButtons
+            book={book}
+            percentRows={allPercentRows}
+            customPercentRow={customPercentRow}
+            wpm={wpm}
+            wpp={wpp}
+            totalPages={0}
+          />
+
+          {selectedPercentRow && (
+            <ReminderForm book={book} selectedPercentRow={selectedPercentRow} />
+          )}
         </>
       ) : (
         <>

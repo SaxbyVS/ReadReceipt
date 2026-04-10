@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { Book } from "@/types";
 
-const STORAGE_KEY = "readreceipt-recent-books";
+const STORAGE_KEY = "readreceipt-recent-books-v2";
 
 type RecentBook = {
   isbn: string;

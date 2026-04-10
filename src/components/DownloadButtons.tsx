@@ -1,11 +1,13 @@
 "use client";
 
-import { Book, ProjectionRow } from "@/types";
+import { Book, PercentProjectionRow, ProjectionRow } from "@/types";
 
 interface DownloadButtonsProps {
   book: Book;
-  rows: ProjectionRow[];
+  rows?: ProjectionRow[];
+  percentRows?: PercentProjectionRow[];
   customRow?: ProjectionRow | null;
+  customPercentRow?: PercentProjectionRow | null;
   wpm: number;
   wpp: number;
   totalPages: number;
@@ -22,27 +24,35 @@ function formatDateForExport(iso: string): string {
 
 export default function DownloadButtons({
   book,
-  rows,
+  rows = [],
+  percentRows = [],
   customRow = null,
+  customPercentRow = null,
   wpm,
   wpp,
   totalPages,
 }: DownloadButtonsProps) {
   // ─── CSV Download ──────────────────────────────────────
 
+  const isPercentMode = percentRows.length > 0;
+
   function downloadCSV() {
-    const header = "Hours/Day,Pages/Day,Days to Finish,Total Hours,Finish Date";
-    const csvRows = rows.map(
-      (r) =>
-        `${r.hoursPerDay},${r.pagesPerDay},${r.daysToFinish},${r.totalHours},${formatDateForExport(r.finishDate)}`
-    );
+    const header = isPercentMode
+      ? "Percent/Day,Days to Finish,Finish Date"
+      : "Hours/Day,Pages/Day,Days to Finish,Total Hours,Finish Date";
+    const csvRows = isPercentMode
+      ? percentRows.map((r) => `${r.percentPerDay},${r.daysToFinish},${formatDateForExport(r.finishDate)}`)
+      : rows.map(
+          (r) =>
+            `${r.hoursPerDay},${r.pagesPerDay},${r.daysToFinish},${r.totalHours},${formatDateForExport(r.finishDate)}`
+        );
 
     const meta = [
       `# ReadReceipt - Reading Projection`,
       `# Book: ${book.title}`,
       `# Author(s): ${book.authors.join(", ")}`,
       `# Pages: ${totalPages}`,
-      `# Reading Speed: ${wpm} wpm (${wpp} words/page)`,
+      isPercentMode ? `# Percent-per-day schedule` : `# Reading Speed: ${wpm} wpm (${wpp} words/page)`,
       `# Generated: ${new Date().toLocaleDateString()}`,
       "",
     ];
@@ -65,6 +75,11 @@ export default function DownloadButtons({
       Math.abs(row.hoursPerDay - customRow.hoursPerDay) < 0.01 &&
       row.pagesPerDay === customRow.pagesPerDay
     );
+  }
+
+  function isCustomPercentRow(row: PercentProjectionRow): boolean {
+    if (!customPercentRow) return false;
+    return row.percentPerDay === customPercentRow.percentPerDay;
   }
 
   async function downloadPDF() {
@@ -124,17 +139,30 @@ export default function DownloadButtons({
     // Table with YOUR PICK highlighting
     autoTable(doc, {
       startY: 60,
-      head: [["Hours/Day", "Pages/Day", "Days to Finish", "Total Hours", "Finish Date"]],
-      body: rows.map((r) => {
-        const pick = isCustomRow(r);
-        return [
-          pick ? `>>> ${r.hoursPerDay}h YOUR PICK` : `${r.hoursPerDay}h`,
-          r.pagesPerDay.toString(),
-          `${r.daysToFinish} days`,
-          `${r.totalHours}h`,
-          formatDateForExport(r.finishDate),
-        ];
-      }),
+      head: [
+        isPercentMode
+          ? ["Percent/Day", "Days to Finish", "Finish Date"]
+          : ["Hours/Day", "Pages/Day", "Days to Finish", "Total Hours", "Finish Date"],
+      ],
+      body: isPercentMode
+        ? percentRows.map((r) => {
+            const pick = isCustomPercentRow(r);
+            return [
+              pick ? `>>> ${r.percentPerDay}% YOUR PICK` : `${r.percentPerDay}%`,
+              `${r.daysToFinish} days`,
+              formatDateForExport(r.finishDate),
+            ];
+          })
+        : rows.map((r) => {
+            const pick = isCustomRow(r);
+            return [
+              pick ? `>>> ${r.hoursPerDay}h YOUR PICK` : `${r.hoursPerDay}h`,
+              r.pagesPerDay.toString(),
+              `${r.daysToFinish} days`,
+              `${r.totalHours}h`,
+              formatDateForExport(r.finishDate),
+            ];
+          }),
       theme: "grid",
       headStyles: {
         fillColor: colors.accent,
@@ -156,7 +184,10 @@ export default function DownloadButtons({
       },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       didParseCell: (data: any) => {
-        if (data.section === "body" && isCustomRow(rows[data.row.index])) {
+        const isPick = isPercentMode
+          ? isCustomPercentRow(percentRows[data.row.index])
+          : isCustomRow(rows[data.row.index]);
+        if (data.section === "body" && isPick) {
           data.cell.styles.fillColor = colors.accent;
           data.cell.styles.textColor = isDark ? [0, 0, 0] : [255, 255, 255];
           data.cell.styles.fontStyle = "bold";
