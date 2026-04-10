@@ -4,6 +4,7 @@ export interface Book {
   isbn: string;
   title: string;
   authors: string[];
+  source?: "openlibrary" | "manual";
   language: string | null;
   pageCount: number | null;
   wordCount: number | null;

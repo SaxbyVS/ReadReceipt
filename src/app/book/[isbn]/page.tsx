@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import BookInfo from "@/components/BookInfo";
 import ProjectionMap from "@/components/ProjectionMap";
+import RecentBookTracker from "@/components/RecentBookTracker";
 import { ApiResponse, Book } from "@/types";
 
 interface BookPageProps {
@@ -62,6 +63,7 @@ export default async function BookPage({ params, searchParams }: BookPageProps) 
         &larr; // BACK TO SEARCH
       </Link>
 
+      <RecentBookTracker book={book} />
       <BookInfo book={book} />
       <ProjectionMap book={book} />
     </div>

@@ -8,6 +8,20 @@ interface ReminderFormProps {
   selectedRow: ProjectionRow;
 }
 
+function getNextReminderDate(now: Date = new Date()): Date {
+  const next = new Date(now);
+  const day = next.getUTCDay();
+  const daysUntilMonday = (8 - day) % 7;
+  next.setUTCDate(next.getUTCDate() + daysUntilMonday);
+  next.setUTCHours(9, 0, 0, 0);
+
+  if (next <= now) {
+    next.setUTCDate(next.getUTCDate() + 7);
+  }
+
+  return next;
+}
+
 export default function ReminderForm({ book, selectedRow }: ReminderFormProps) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -41,10 +55,11 @@ export default function ReminderForm({ book, selectedRow }: ReminderFormProps) {
 
       if (data.success) {
         setStatus("success");
+        const firstReminder = getNextReminderDate();
         setMessage(
           `Reminder set! You'll receive weekly emails about "${book.title}" until ${new Date(
             selectedRow.finishDate
-          ).toLocaleDateString()}.`
+          ).toLocaleDateString()}. First reminder: ${firstReminder.toLocaleString()}.`
         );
         setEmail("");
       } else {

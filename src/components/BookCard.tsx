@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { BookSearchResult } from "@/types";
 
@@ -12,12 +13,14 @@ export default function BookCard({ book }: BookCardProps) {
       className="group flex gap-4 border-2 border-border bg-bg-surface p-4 hover:border-accent"
     >
       {/* Cover thumbnail */}
-      <div className="h-28 w-20 flex-shrink-0 overflow-hidden border border-border bg-bg-elevated">
+      <div className="relative h-28 w-20 flex-shrink-0 overflow-hidden border border-border bg-bg-elevated">
         {book.coverUrl ? (
-          <img
+          <Image
             src={book.coverUrl}
             alt={`Cover of ${book.title}`}
-            className="h-full w-full object-cover"
+            fill
+            sizes="80px"
+            className="object-cover"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-xs font-mono uppercase text-fg-muted">

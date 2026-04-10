@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Book, PercentProjectionRow, ProjectionMode, ProjectionRow } from "@/types";
 import {
   DEFAULT_WPM,
@@ -29,13 +29,47 @@ function formatDate(iso: string): string {
 }
 
 export default function ProjectionMap({ book }: ProjectionMapProps) {
-  const [mode, setMode] = useState<ProjectionMode>("hours");
-  const [wpm, setWpm] = useState(DEFAULT_WPM);
-  const [wpp, setWpp] = useState(DEFAULT_WPP);
+  const [mode, setMode] = useState<ProjectionMode>(() => {
+    if (typeof window === "undefined") return "hours";
+    try {
+      const saved = JSON.parse(window.localStorage.getItem("readreceipt-defaults") ?? "{}");
+      return saved.mode === "hours" || saved.mode === "pages" || saved.mode === "percent"
+        ? saved.mode
+        : "hours";
+    } catch {
+      return "hours";
+    }
+  });
+  const [wpm, setWpm] = useState(() => {
+    if (typeof window === "undefined") return DEFAULT_WPM;
+    try {
+      const saved = JSON.parse(window.localStorage.getItem("readreceipt-defaults") ?? "{}");
+      return typeof saved.wpm === "number" ? saved.wpm : DEFAULT_WPM;
+    } catch {
+      return DEFAULT_WPM;
+    }
+  });
+  const [wpp, setWpp] = useState(() => {
+    if (typeof window === "undefined") return DEFAULT_WPP;
+    try {
+      const saved = JSON.parse(window.localStorage.getItem("readreceipt-defaults") ?? "{}");
+      return typeof saved.wpp === "number" ? saved.wpp : DEFAULT_WPP;
+    } catch {
+      return DEFAULT_WPP;
+    }
+  });
   const [customHours, setCustomHours] = useState(1);
   const [customPages, setCustomPages] = useState(30);
   const [customPercent, setCustomPercent] = useState(5);
   const [manualPageCount, setManualPageCount] = useState("");
+  const [shareMessage, setShareMessage] = useState("");
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      "readreceipt-defaults",
+      JSON.stringify({ wpm, wpp, mode })
+    );
+  }, [wpm, wpp, mode]);
 
   const parsedManualPageCount = manualPageCount ? parseInt(manualPageCount, 10) : null;
   const hasPageCountOverride =
@@ -111,6 +145,23 @@ export default function ProjectionMap({ book }: ProjectionMapProps) {
 
   // Selected row for reminder (defaults to the custom row or 1 hour/day)
   const selectedRow = customRow ?? tableRows.find((r) => r.hoursPerDay === 1) ?? tableRows[0];
+
+  async function copyPlanSummary() {
+    if (!selectedRow) return;
+    const summary = [
+      `ReadReceipt plan for ${book.title}`,
+      book.authors.length > 0 ? `Author: ${book.authors.join(", ")}` : null,
+      `Pace: ${selectedRow.hoursPerDay}h/day (${selectedRow.pagesPerDay} pages/day)`,
+      `Finish: ${formatDate(selectedRow.finishDate)}`,
+      `Total reading time: ${selectedRow.totalHours} hours`,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    await navigator.clipboard.writeText(summary);
+    setShareMessage("Plan summary copied.");
+    window.setTimeout(() => setShareMessage(""), 2000);
+  }
 
   return (
     <div className="mt-10 space-y-8">
@@ -282,7 +333,18 @@ export default function ProjectionMap({ book }: ProjectionMapProps) {
           </p>
 
           {/* Download Buttons */}
-          <DownloadButtons book={book} rows={allRows} wpm={wpm} wpp={wpp} totalPages={totalPages} />
+          <DownloadButtons book={book} rows={allRows} customRow={customRow} wpm={wpm} wpp={wpp} totalPages={totalPages} />
+
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={copyPlanSummary}
+              className="border-2 border-border bg-bg-surface px-5 py-2 text-sm font-mono font-bold uppercase tracking-wider text-fg hover:border-accent hover:text-accent"
+            >
+              Copy Plan Summary
+            </button>
+            {shareMessage && <span className="text-sm font-mono text-accent">{shareMessage}</span>}
+          </div>
 
           {/* Reminder Form */}
           {selectedRow && (

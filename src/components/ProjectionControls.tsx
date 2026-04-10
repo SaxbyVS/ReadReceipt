@@ -57,7 +57,7 @@ export default function ProjectionControls({
       <div className="border-2 border-border bg-bg-surface p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-          <label className="block font-mono text-xs uppercase tracking-widest text-fg-muted mb-2">
+          <label className="block font-mono text-xs uppercase tracking-widest text-accent mb-2">
             {defaultPageCount !== null
               ? "// PAGE COUNT (EDITABLE)"
               : "// ENTER PAGE COUNT (OPTIONAL)"}
@@ -83,11 +83,6 @@ export default function ProjectionControls({
             </button>
           )}
         </div>
-        {defaultPageCount !== null && (
-          <p className="mt-3 text-xs font-mono text-fg-muted uppercase tracking-wide">
-            {`// default from open library: ${defaultPageCount} pages`}
-          </p>
-        )}
         {!hasPageCount && (
           <p className="mt-3 text-xs font-mono text-fg-muted uppercase tracking-wide">
             {"// no page count? use percent/day mode below"}
@@ -99,7 +94,7 @@ export default function ProjectionControls({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Reading Speed */}
         <div className="border-2 border-border bg-bg-surface p-4">
-          <label className="block font-mono text-xs uppercase tracking-widest text-fg-muted mb-3">
+          <label className="block font-mono text-xs uppercase tracking-widest text-accent mb-3">
             {"// READING SPEED"}
           </label>
           <div className="space-y-3">
@@ -140,7 +135,7 @@ export default function ProjectionControls({
 
         {/* Daily Goal */}
         <div className="border-2 border-border bg-bg-surface p-4">
-          <label className="block font-mono text-xs uppercase tracking-widest text-fg-muted mb-3">
+          <label className="block font-mono text-xs uppercase tracking-widest text-accent mb-3">
             {"// DAILY GOAL"}
           </label>
 

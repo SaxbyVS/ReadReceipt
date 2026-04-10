@@ -214,8 +214,23 @@ export async function getBookByISBN(
 
   const resolvedEdition = edition;
 
+  let work: OLWorkResponse | null = null;
+  if (resolvedEdition.works?.[0]?.key) {
+    try {
+      const workRes = await fetch(`${OL_BASE}${resolvedEdition.works[0].key}.json`);
+      if (workRes.ok) {
+        work = await workRes.json();
+      }
+    } catch {
+      work = null;
+    }
+  }
+
   // Step 2: Resolve author names
-  const authorKeys = resolvedEdition.authors?.map((a) => a.key) ?? [];
+  const authorKeys =
+    resolvedEdition.authors?.map((a) => a.key) ??
+    work?.authors?.map((a) => a.author.key) ??
+    [];
   const authorNames = await Promise.all(
     authorKeys.map(async (key) => {
       try {
@@ -260,18 +275,8 @@ export async function getBookByISBN(
 
   // Step 4: Try to get word count from the work (if available)
   let wordCount: number | null = null;
-  if (resolvedEdition.works?.[0]?.key) {
-    try {
-      const workRes = await fetch(`${OL_BASE}${resolvedEdition.works[0].key}.json`);
-      if (workRes.ok) {
-        const work: OLWorkResponse = await workRes.json();
-        if (typeof work.word_count === "number") {
-          wordCount = work.word_count;
-        }
-      }
-    } catch {
-      // word count fetch is best-effort
-    }
+  if (work && typeof work.word_count === "number") {
+    wordCount = work.word_count;
   }
 
   // Step 5: Estimate word count from page count if not available
@@ -293,6 +298,7 @@ export async function getBookByISBN(
     isbn: finalIsbn,
     title: resolvedEdition.title,
     authors: authorNames.length > 0 ? authorNames : ["Unknown Author"],
+    source: "openlibrary",
     language: getPrimaryLanguageLabel(resolvedEdition),
     pageCount,
     wordCount,
