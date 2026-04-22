@@ -69,6 +69,20 @@ button, a, input, select {
   transition: none;
 }
 
+button,
+a,
+input[type="button"],
+input[type="submit"],
+input[type="reset"] {
+  cursor: pointer;
+}
+
+button:disabled,
+input:disabled,
+select:disabled {
+  cursor: not-allowed;
+}
+
 /* Brutalist heading style — uppercase, tracked, mono */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-mono), monospace;
