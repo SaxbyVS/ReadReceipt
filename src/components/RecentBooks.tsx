@@ -16,11 +16,11 @@ type RecentBook = {
   href: string;
 };
 
-function shortenTitle(title: string, maxLength = 26): string {
+function shortenTitle(title: string, maxLength = 31): string {
   return title.length > maxLength ? `${title.slice(0, maxLength - 1)}…` : title;
 }
 
-function isTitleTruncated(title: string, maxLength = 26): boolean {
+function isTitleTruncated(title: string, maxLength = 31): boolean {
   return title.length > maxLength;
 }
 
@@ -56,7 +56,7 @@ export default function RecentBooks() {
   }
 
   return (
-    <section className="border-2 border-border bg-bg-surface p-4 space-y-4 rounded-lg">
+    <section className="overflow-visible border-2 border-border bg-bg-surface p-4 space-y-4 rounded-lg">
       <div className="flex items-start justify-between gap-3 border-b border-border pb-2">
         <h2 className="text-sm font-mono uppercase tracking-widest text-accent">
           {"// RECENT BOOKS"}
@@ -69,12 +69,12 @@ export default function RecentBooks() {
           Clear
         </button>
       </div>
-      <div className="grid gap-2 overflow-visible">
+      <div className="grid gap-2 overflow-visible pr-[25px]">
         {liveBooks.map((book) => (
           <Link
             key={`${book.isbn}-${book.title}`}
             href={book.href}
-            className="group relative box-border flex h-[118px] w-full -translate-x-[1px] gap-4 border-2 border-border bg-bg p-4 transition-all duration-150 hover:z-10 hover:border-accent hover:bg-accent-dim focus-visible:z-10 focus-visible:border-accent focus-visible:bg-accent-dim rounded-md"
+            className="group relative box-border flex h-[118px] w-[calc(100%+25px)] -translate-x-[1px] gap-4 rounded-md border-2 border-border bg-bg p-4 transition-all duration-150 hover:z-10 hover:border-accent hover:bg-accent-dim focus-visible:z-10 focus-visible:border-accent focus-visible:bg-accent-dim"
           >
             <span className="absolute left-3 top-[-2px] h-2.5 w-12 border-x-2 border-t-2 border-accent bg-accent-dim transition-all duration-150 group-hover:w-16 group-focus-visible:w-16" />
             <div className="relative h-24 w-[72px] flex-shrink-0 overflow-hidden border border-border bg-bg-elevated">
@@ -93,7 +93,7 @@ export default function RecentBooks() {
               )}
             </div>
             <div className="min-w-0 flex flex-1 flex-col justify-center gap-1 overflow-hidden">
-              <div className="h-10 max-w-[150px] overflow-hidden">
+              <div className="h-10 max-w-[175px] overflow-hidden">
                 <h3 className="truncate font-mono text-sm font-bold uppercase tracking-wide text-fg group-hover:text-accent group-focus-visible:text-accent">{shortenTitle(book.title)}</h3>
               </div>
               {isTitleTruncated(book.title) && (
