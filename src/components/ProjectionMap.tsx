@@ -14,6 +14,7 @@ import {
 import ProjectionControls from "./ProjectionControls";
 import DownloadButtons from "./DownloadButtons";
 import ReminderForm from "./ReminderForm";
+import { ReceiptCode, receiptCodeFromIsbn } from "@/lib/receiptCode";
 
 interface ProjectionMapProps {
   book: Book;
@@ -147,6 +148,12 @@ export default function ProjectionMap({ book }: ProjectionMapProps) {
   const selectedRow = customRow ?? tableRows.find((r) => r.hoursPerDay === 1) ?? tableRows[0];
   const selectedPercentRow = customPercentRow ?? percentTableRows.find((r) => r.percentPerDay === 5) ?? percentTableRows[0];
 
+  // Stable order number + barcode pattern, derived from the book's identity.
+  const receiptCode = useMemo<ReceiptCode>(
+    () => receiptCodeFromIsbn(book.isbn, book.title),
+    [book.isbn, book.title]
+  );
+
   async function copyPlanSummary() {
     if (!selectedRow) return;
     const summary = [
@@ -199,7 +206,10 @@ export default function ProjectionMap({ book }: ProjectionMapProps) {
         </div>
       ) : usePercentMode ? (
         <>
-          <div className="border-[3px] border-border-hard">
+          <div className="receipt-wrap">
+          <div className="receipt-edge-top" aria-hidden="true" />
+          <div className="border-x-[3px] border-border-hard bg-bg">
+            <ReceiptHeader orderNumber={receiptCode.orderNumber} />
             <div className="bg-bg-surface border-b-2 border-border-hard px-4 py-3">
               <h3 className="font-mono text-sm font-bold uppercase tracking-widest text-fg">
                 PROJECTION TABLE - PERCENT OF BOOK PER DAY
@@ -250,6 +260,19 @@ export default function ProjectionMap({ book }: ProjectionMapProps) {
                 </tbody>
               </table>
             </div>
+
+            <ReceiptFooter
+              orderNumber={receiptCode.orderNumber}
+              barcodeWidths={receiptCode.barcodeWidths}
+              totalLabel="TOTAL"
+              totalValue={
+                selectedPercentRow
+                  ? `100% · ${selectedPercentRow.daysToFinish}D`
+                  : "100%"
+              }
+            />
+          </div>
+          <div className="receipt-edge-bottom" aria-hidden="true" />
           </div>
 
           <p className="text-xs font-mono text-fg-muted uppercase tracking-wide">
@@ -272,7 +295,10 @@ export default function ProjectionMap({ book }: ProjectionMapProps) {
       ) : (
         <>
           {/* Projection Table — THE MAIN EVENT */}
-          <div className="border-[3px] border-border-hard">
+          <div className="receipt-wrap">
+          <div className="receipt-edge-top" aria-hidden="true" />
+          <div className="border-x-[3px] border-border-hard bg-bg">
+            <ReceiptHeader orderNumber={receiptCode.orderNumber} />
             {/* Table heading bar */}
             <div className="bg-bg-surface border-b-2 border-border-hard px-4 py-3">
               <div className="flex flex-wrap items-center gap-3">
@@ -340,6 +366,19 @@ export default function ProjectionMap({ book }: ProjectionMapProps) {
                 </tbody>
               </table>
             </div>
+
+            <ReceiptFooter
+              orderNumber={receiptCode.orderNumber}
+              barcodeWidths={receiptCode.barcodeWidths}
+              totalLabel="TOTAL"
+              totalValue={
+                selectedRow
+                  ? `${totalPages.toLocaleString()} PG · ${selectedRow.totalHours}H`
+                  : `${totalPages.toLocaleString()} PG`
+              }
+            />
+          </div>
+          <div className="receipt-edge-bottom" aria-hidden="true" />
           </div>
 
           <p className="text-xs font-mono text-fg-muted uppercase tracking-wide">
@@ -366,6 +405,73 @@ export default function ProjectionMap({ book }: ProjectionMapProps) {
           )}
         </>
       )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Receipt chrome — header, timestamp, and footer subcomponents.       */
+/* Purely visual. No effect on projection logic or exports.            */
+/* ------------------------------------------------------------------ */
+
+function PrintTimestamp() {
+  const [stamp, setStamp] = useState<string>("--/--/---- --:--:--");
+
+  useEffect(() => {
+    const format = () => {
+      const d = new Date();
+      const pad = (n: number) => n.toString().padStart(2, "0");
+      const datePart = `${pad(d.getMonth() + 1)}/${pad(d.getDate())}/${d.getFullYear()}`;
+      const timePart = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      setStamp(`${datePart} ${timePart}`);
+    };
+    format();
+    const id = window.setInterval(format, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  return <span suppressHydrationWarning>{stamp}</span>;
+}
+
+function ReceiptHeader({ orderNumber }: { orderNumber: string }) {
+  return (
+    <div className="border-b border-dashed border-border px-4 py-3 font-mono text-[11px] uppercase tracking-widest text-fg-muted leading-relaxed">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="text-fg">READRECEIPT · TERMINAL v1.0</span>
+        <span>ORDER #{orderNumber}</span>
+      </div>
+      <div className="mt-1">
+        [<PrintTimestamp />] PRINTING PROJECTION.LOG
+      </div>
+    </div>
+  );
+}
+
+interface ReceiptFooterProps {
+  orderNumber: string;
+  barcodeWidths: number[];
+  totalLabel: string;
+  totalValue: string;
+}
+
+function ReceiptFooter({ orderNumber, barcodeWidths, totalLabel, totalValue }: ReceiptFooterProps) {
+  return (
+    <div className="border-t border-dashed border-border px-4 py-4 space-y-3 font-mono text-xs uppercase tracking-widest text-fg-muted">
+      <div className="receipt-leader text-fg">
+        <span className="font-bold">{totalLabel}</span>
+        <span className="receipt-leader__dots" aria-hidden="true" />
+        <span className="font-bold">{totalValue}</span>
+      </div>
+
+      <div className="barcode" role="img" aria-label={`Barcode for order ${orderNumber}`}>
+        {barcodeWidths.map((w, i) => (
+          <span key={i} style={{ width: `${w}px` }} />
+        ))}
+      </div>
+
+      <div className="text-center text-fg tracking-[0.35em]">{orderNumber}</div>
+
+      <div className="text-center text-accent">{"// END OF TRANSMISSION"}</div>
     </div>
   );
 }

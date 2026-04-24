@@ -223,3 +223,76 @@ h1, h2, h3, h4, h5, h6 {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--fg-muted);
 }
+
+/* ------------------------------------------------------------------ */
+/* Receipt chrome utilities — perforated tear edges, leader dots, barcode */
+/* ------------------------------------------------------------------ */
+
+/* Perforated scallop strips used in place of the top/bottom border of a
+   receipt-style container. The side borders (border-x-[3px]) remain on the
+   container; these strips sit above/below it and share --border-hard. */
+.receipt-edge-top,
+.receipt-edge-bottom {
+  height: 12px;
+  background-color: var(--border-hard);
+  --receipt-scallop: radial-gradient(
+    circle at 8px 0,
+    transparent 6px,
+    #000 6.5px
+  );
+  -webkit-mask-image: var(--receipt-scallop);
+          mask-image: var(--receipt-scallop);
+  -webkit-mask-repeat: repeat-x;
+          mask-repeat: repeat-x;
+  -webkit-mask-size: 16px 12px;
+          mask-size: 16px 12px;
+}
+
+.receipt-edge-top {
+  -webkit-mask-position: 0 0;
+          mask-position: 0 0;
+}
+
+.receipt-edge-bottom {
+  /* Flip vertically so the scallops bite upward into the container. */
+  -webkit-mask-image: radial-gradient(
+    circle at 8px 12px,
+    transparent 6px,
+    #000 6.5px
+  );
+          mask-image: radial-gradient(
+    circle at 8px 12px,
+    transparent 6px,
+    #000 6.5px
+  );
+}
+
+/* Leader-dot row: <span>LABEL</span><span class="receipt-leader__dots" /><span>VALUE</span> */
+.receipt-leader {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.receipt-leader__dots {
+  flex: 1 1 auto;
+  border-bottom: 1px dotted currentColor;
+  transform: translateY(-0.35em);
+  opacity: 0.7;
+}
+
+/* CSS barcode — children are <span>s with inline width + uniform height. */
+.barcode {
+  display: flex;
+  align-items: stretch;
+  gap: 1.5px;
+  height: 36px;
+  width: 100%;
+}
+
+.barcode > span {
+  display: block;
+  background: var(--fg);
+  height: 100%;
+}
