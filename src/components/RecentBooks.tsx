@@ -3,6 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import bookmarkBlue from "../../graphic_assets/bookmark-blue.svg";
+import bookmarkGreen from "../../graphic_assets/bookmark-green.svg";
 
 const STORAGE_KEY = "readreceipt-recent-books-v2";
 
@@ -25,6 +27,7 @@ function isTitleTruncated(title: string, maxLength = 31): boolean {
 }
 
 export default function RecentBooks() {
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [books] = useState<RecentBook[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -45,7 +48,23 @@ export default function RecentBooks() {
     return () => window.removeEventListener("readreceipt:recent-books-updated", handleRecentBooksUpdate);
   }, []);
 
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const root = document.documentElement;
+    const syncTheme = () => setTheme(root.dataset.theme === "light" ? "light" : "dark");
+
+    syncTheme();
+
+    const observer = new MutationObserver(syncTheme);
+    observer.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
+
+    return () => observer.disconnect();
+  }, []);
+
   if (liveBooks.length === 0) return null;
+
+  const bookmarkAsset = theme === "light" ? bookmarkBlue : bookmarkGreen;
 
   function clearRecentBooks() {
     const confirmed = window.confirm("Clear all recent books?");
@@ -70,12 +89,21 @@ export default function RecentBooks() {
         </button>
       </div>
       <div className="grid gap-2 overflow-visible pr-[25px]">
-        {liveBooks.map((book) => (
+        {liveBooks.map((book, index) => (
           <Link
             key={`${book.isbn}-${book.title}`}
             href={book.href}
-            className="group relative box-border flex h-[118px] w-[calc(100%+25px)] -translate-x-[1px] gap-4 rounded-md border-2 border-border bg-bg p-4 transition-all duration-150 hover:z-10 hover:border-accent hover:bg-accent-dim focus-visible:z-10 focus-visible:border-accent focus-visible:bg-accent-dim"
+            style={{ zIndex: liveBooks.length - index }}
+            className="group relative box-border flex h-[118px] w-[calc(100%+25px)] -translate-x-[1px] gap-4 rounded-md border-2 border-border bg-bg p-4 transition-all duration-150 hover:z-50 hover:border-accent hover:bg-accent-dim focus-visible:z-50 focus-visible:border-accent focus-visible:bg-accent-dim"
           >
+            <span className="pointer-events-none absolute -bottom-[30px] right-4 z-30 origin-top transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-y-150 group-focus-visible:scale-y-150">
+              <Image
+                src={bookmarkAsset}
+                alt=""
+                aria-hidden="true"
+                className="block h-auto w-[28px]"
+              />
+            </span>
             <span className="absolute left-3 top-[-2px] h-2.5 w-12 border-x-2 border-t-2 border-accent bg-accent-dim transition-all duration-150 group-hover:w-16 group-focus-visible:w-16" />
             <div className="relative h-24 w-[72px] flex-shrink-0 overflow-hidden border border-border bg-bg-elevated">
               {book.coverUrl ? (
