@@ -1,5 +1,6 @@
 # ReadReceipt
  - Next.JS fullstack web application deployed on Vercel
+ - as of 5/3: 50+ users
 
 ## Features
  - Vast array of books to choose from (provided by OpenLibrary)
